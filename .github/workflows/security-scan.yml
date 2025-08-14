@@ -80,7 +80,7 @@ jobs:
         echo "View detailed results at: https://sonarcloud.io/project/overview?id=Sathvikasharma07_Fitness_Scheduler_System" >> combined-security-report.md
     
     - name: Upload Security Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-reports
