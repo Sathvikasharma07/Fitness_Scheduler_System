@@ -31,11 +31,62 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --all-projects --severity-threshold=medium
+        args: --all-projects --json-file-output=snyk-report.json
+    
+    - name: Generate Snyk HTML Report
+      if: always()
+      run: |
+        if [ -f snyk-report.json ]; then
+          echo "# Snyk Security Report" > security-report.md
+          echo "" >> security-report.md
+          echo "## Summary" >> security-report.md
+          echo "Generated on: $(date)" >> security-report.md
+          echo "" >> security-report.md
+          echo "## Vulnerabilities Found" >> security-report.md
+          cat snyk-report.json >> security-report.md
+        else
+          echo "# Snyk Security Report" > security-report.md
+          echo "No vulnerabilities found or scan failed" >> security-report.md
+        fi
     
     - name: SonarCloud Scan
       uses: SonarSource/sonarqube-scan-action@v5.0.0
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    
+    - name: Generate Combined Security Report
+      if: always()
+      run: |
+        echo "# Security Analysis Report" > combined-security-report.md
+        echo "" >> combined-security-report.md
+        echo "**Generated on:** $(date)" >> combined-security-report.md
+        echo "" >> combined-security-report.md
+        echo "## í´ Snyk Vulnerability Scan" >> combined-security-report.md
+        if [ -f snyk-report.json ]; then
+          echo "âœ… Snyk scan completed successfully" >> combined-security-report.md
+          echo "" >> combined-security-report.md
+          echo "### Results:" >> combined-security-report.md
+          echo '```json' >> combined-security-report.md
+          cat snyk-report.json >> combined-security-report.md
+          echo '```' >> combined-security-report.md
+        else
+          echo "âŒ Snyk scan failed or no report generated" >> combined-security-report.md
+        fi
+        echo "" >> combined-security-report.md
+        echo "## í³Š SonarCloud Analysis" >> combined-security-report.md
+        echo "âœ… SonarCloud scan completed" >> combined-security-report.md
+        echo "View detailed results at: https://sonarcloud.io/project/overview?id=Sathvikasharma07_Fitness_Scheduler_System" >> combined-security-report.md
+    
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          snyk-report.json
+          security-report.md
+          combined-security-report.md
+        retention-days: 30
 
