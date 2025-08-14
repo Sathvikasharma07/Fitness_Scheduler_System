@@ -1,0 +1,74 @@
+<div class="manage-schedule-container">
+  <div class="calendar-header">
+    <h2>Manage Classes</h2>
+    <div class="view-toggle">
+      <button [class.active]="viewMode === 'weekly'" (click)="viewMode = 'weekly'; switchView()">Weekly</button>
+      <button [class.active]="viewMode === 'monthly'" (click)="viewMode = 'monthly'; switchView()">Monthly</button>
+    </div>
+  </div>
+
+  <div class="calendar-navigation">
+    <button (click)="previousPeriod()" class="nav-btn">‹</button>
+    <h3 *ngIf="viewMode === 'weekly'">
+      Week of {{ getWeekDates()[0] | date:'MMM d' }} - {{ getWeekDates()[6] | date:'MMM d, yyyy' }}
+    </h3>
+    <h3 *ngIf="viewMode === 'monthly'">
+      {{ months[currentDate.getMonth()] }} {{ currentDate.getFullYear() }}
+    </h3>
+    <button (click)="nextPeriod()" class="nav-btn">›</button>
+
+  </div>
+
+  <!-- Weekly View -->
+  <div *ngIf="viewMode === 'weekly'" class="weekly-calendar">
+    <div class="week-header">
+      <div *ngFor="let day of weekDays" class="day-header">{{ day }}</div>
+    </div>
+    <div class="week-body">
+      <div *ngFor="let date of getWeekDates()" 
+           class="day-cell" 
+           [class.today]="isToday(date)"
+           [class.has-classes]="getClassesForDate(date).length > 0">
+        <span class="date-number">{{ date.getDate() }}</span>
+        <div class="class-list">
+          <div *ngFor="let class of getClassesForDate(date)" class="class-item">
+            <div class="class-info">
+              <div class="class-name">{{ class.name }}</div>
+              <div class="class-time">{{ class.start_time }}</div>
+            </div>
+            <button class="remove-btn" (click)="removeFromSchedule(class.id)" title="Remove from schedule">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly View -->
+  <div *ngIf="viewMode === 'monthly'" class="monthly-calendar">
+    <div class="month-header">
+      <div *ngFor="let day of weekDays" class="day-header">{{ day }}</div>
+    </div>
+    <div class="month-body">
+      <div *ngFor="let date of getMonthDates()" 
+           class="day-cell"
+           [class.today]="isToday(date)"
+           [class.other-month]="!isCurrentMonth(date)"
+           [class.has-classes]="getClassesForDate(date).length > 0"
+>
+        <span class="date-number">{{ date.getDate() }}</span>
+        <div class="class-list">
+          <div *ngFor="let class of getClassesForDate(date)" class="class-item">
+            <div class="class-info">
+              <div class="class-name">{{ class.name }}</div>
+              <div class="class-time">{{ class.start_time }}</div>
+            </div>
+            <button class="remove-btn" (click)="removeFromSchedule(class.id)" title="Remove from schedule">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>

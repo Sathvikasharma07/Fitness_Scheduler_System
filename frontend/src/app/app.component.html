@@ -1,0 +1,31 @@
+<div class="app-container">
+  <div *ngIf="!isLoggedIn" class="auth-container">
+    <div class="auth-toggle">
+      <button [class.active]="showLogin" (click)="showLogin = true">Login</button>
+      <button [class.active]="!showLogin" (click)="showLogin = false">Register</button>
+    </div>
+    <app-login *ngIf="showLogin" (loginSuccess)="onLoginSuccess()"></app-login>
+    <app-register *ngIf="!showLogin" (registerSuccess)="onRegisterSuccess()"></app-register>
+  </div>
+  
+  <div *ngIf="isLoggedIn" class="main-content">
+    <nav class="navbar">
+      <h1>{{title}}</h1>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </nav>
+    <div class="content">
+      <div class="tabs">
+        <button [class.active]="activeTab === 'schedule'" (click)="activeTab = 'schedule'">Daily Schedule</button>
+        <button [class.active]="activeTab === 'classes'" (click)="activeTab = 'classes'">Available Classes</button>
+        <button [class.active]="activeTab === 'manage'" (click)="activeTab = 'manage'">Manage Classes</button>
+      </div>
+      <app-daily-schedule *ngIf="activeTab === 'schedule'"></app-daily-schedule>
+      <div *ngIf="activeTab === 'classes'">
+        <app-class-list></app-class-list>
+      </div>
+      <div *ngIf="activeTab === 'manage'">
+        <app-manage-schedule></app-manage-schedule>
+      </div>
+    </div>
+  </div>
+</div>

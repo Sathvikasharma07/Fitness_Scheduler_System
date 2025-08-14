@@ -1,0 +1,34 @@
+<div>
+  <form (ngSubmit)="onSubmit()">
+    <h2>Add New Class</h2>
+    <div>
+      <label>Name:</label>
+      <input type="text" [(ngModel)]="class.name" name="name" required>
+    </div>
+    <div>
+      <label>Description:</label>
+      <textarea [(ngModel)]="class.description" name="description" required></textarea>
+    </div>
+    <div>
+      <label>Date:</label>
+      <input type="date" [(ngModel)]="class.class_date" name="class_date" required>
+    </div>
+    <div>
+      <label>Start Time:</label>
+      <input type="time" [(ngModel)]="class.start_time" name="start_time" required>
+    </div>
+    <div>
+      <label>Duration (minutes):</label>
+      <input type="number" [(ngModel)]="class.duration" name="duration" required>
+    </div>
+    <div>
+      <label>Capacity:</label>
+      <input type="number" [(ngModel)]="class.capacity" name="capacity" required>
+    </div>
+    <div>
+      <label>Instructor:</label>
+      <input type="text" [(ngModel)]="class.instructor" name="instructor" required>
+    </div>
+    <button type="submit">Add Class</button>
+  </form>
+</div>

@@ -1,0 +1,31 @@
+<div class="auth-card">
+  <div class="card-header">
+    <h2>Join Us</h2>
+    <p>Create your account</p>
+  </div>
+  
+  <form (ngSubmit)="onSubmit()" class="auth-form">
+    <div class="input-group">
+      <input type="text" [(ngModel)]="userData.name" name="name" required placeholder=" ">
+      <label>Full Name</label>
+      <div class="input-line"></div>
+    </div>
+    
+    <div class="input-group">
+      <input type="email" [(ngModel)]="userData.email" name="email" required placeholder=" ">
+      <label>Email Address</label>
+      <div class="input-line"></div>
+    </div>
+    
+    <div class="input-group">
+      <input type="password" [(ngModel)]="userData.password" name="password" required placeholder=" ">
+      <label>Password</label>
+      <div class="input-line"></div>
+    </div>
+    
+    <button type="submit" class="auth-btn">
+      <span>Create Account</span>
+      <div class="btn-ripple"></div>
+    </button>
+  </form>
+</div>

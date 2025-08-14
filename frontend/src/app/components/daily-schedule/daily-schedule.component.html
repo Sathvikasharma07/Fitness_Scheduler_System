@@ -1,0 +1,67 @@
+<div class="daily-schedule-container">
+  <h2>Daily Class Schedule</h2>
+  
+  <!-- Date selector -->
+  <div class="date-selector">
+    <label for="dateInput">Select Date:</label>
+    <input 
+      type="date" 
+      id="dateInput" 
+      [(ngModel)]="selectedDate" 
+      (change)="onDateChange()"
+      class="date-input">
+  </div>
+
+  <!-- Available classes for selected date -->
+  <div class="classes-section">
+    <h3>Available Classes - {{selectedDate}}</h3>
+    <div class="classes-grid" *ngIf="dailyClasses.length > 0; else noClasses">
+      <div *ngFor="let classItem of dailyClasses" class="class-card">
+        <div class="class-info">
+          <h4>{{classItem.name}}</h4>
+          <p class="instructor">Instructor: {{classItem.instructor}}</p>
+          <p class="time">{{classItem.start_time}} ({{classItem.duration}} min)</p>
+          <p class="description">{{classItem.description}}</p>
+          <p class="capacity">Capacity: {{classItem.capacity}}</p>
+        </div>
+        <div class="class-actions">
+          <button 
+            *ngIf="!isClassInSchedule(classItem)" 
+            class="btn-add-schedule" 
+            (click)="addToSchedule(classItem.id)">
+            Add to My Schedule
+          </button>
+          <button 
+            *ngIf="isClassInSchedule(classItem)" 
+            class="btn-remove-schedule" 
+            (click)="removeFromSchedule(classItem.id)">
+            Remove from My Schedule
+          </button>
+        </div>
+      </div>
+    </div>
+    <ng-template #noClasses>
+      <p class="no-classes">No classes available for {{selectedDate}}</p>
+    </ng-template>
+  </div>
+
+  <!-- User's personal schedule -->
+  <div class="my-schedule-section">
+    <h3>My Registered Classes</h3>
+    <div class="schedule-grid" *ngIf="userSchedule.length > 0; else noSchedule">
+      <div *ngFor="let item of userSchedule" class="schedule-item">
+        <div class="schedule-day">
+          <div class="day-name">{{item.class_date | date:'MMM d, yyyy'}}</div>
+        </div>
+        <div class="schedule-details">
+          <h4>{{item.name}} - {{item.class_date | date:'MMM d, yyyy'}}</h4>
+          <p>{{item.start_time}} - {{item.instructor}}</p>
+        </div>
+
+      </div>
+    </div>
+    <ng-template #noSchedule>
+      <p class="no-schedule">No classes in your schedule yet</p>
+    </ng-template>
+  </div>
+</div>

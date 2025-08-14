@@ -1,0 +1,28 @@
+<div class="class-list-container">
+  <h2>Available Classes</h2>
+  <p class="description">Browse all available fitness classes. Use the Daily Schedule tab to add classes to your personal schedule.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Class Name</th>
+        <th>Description</th>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Duration</th>
+        <th>Instructor</th>
+        <th>Capacity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let class of classes">
+        <td>{{class.name}}</td>
+        <td>{{class.description}}</td>
+        <td>{{daysOfWeek[class.day_of_week]}}</td>
+        <td>{{class.start_time}}</td>
+        <td>{{class.duration}} min</td>
+        <td>{{class.instructor}}</td>
+        <td>{{class.capacity}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
