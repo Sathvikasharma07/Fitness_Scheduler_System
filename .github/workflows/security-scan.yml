@@ -159,16 +159,18 @@ jobs:
           security-report.html
         retention-days: 30
     
+    - name: Create GitHub Pages Directory
+      if: always()
+      run: |
+        mkdir -p gh-pages
+        cp security-report.html gh-pages/
+        cp security-report.html gh-pages/index.html
+    
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       if: always()
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        publish_branch: gh-pages
+        publish_dir: gh-pages
         keep_files: false
-        allow_empty_commit: false
-        force_orphan: true
-        enable_jekyll: false
-        disable_nojekyll: false
-        exclude_assets: '.github,frontend,backend,node_modules'
+        allow_empty_commit: true
