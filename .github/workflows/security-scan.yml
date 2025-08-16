@@ -33,22 +33,6 @@ jobs:
       with:
         args: --all-projects --json-file-output=snyk-report.json
     
-    - name: Generate Snyk HTML Report
-      if: always()
-      run: |
-        if [ -f snyk-report.json ]; then
-          echo "# Snyk Security Report" > security-report.md
-          echo "" >> security-report.md
-          echo "## Summary" >> security-report.md
-          echo "Generated on: $(date)" >> security-report.md
-          echo "" >> security-report.md
-          echo "## Vulnerabilities Found" >> security-report.md
-          cat snyk-report.json >> security-report.md
-        else
-          echo "# Snyk Security Report" > security-report.md
-          echo "No vulnerabilities found or scan failed" >> security-report.md
-        fi
-    
     - name: SonarCloud Scan
       uses: SonarSource/sonarqube-scan-action@v5.0.0
       continue-on-error: true
@@ -56,28 +40,114 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     
-    - name: Generate Combined Security Report
+    - name: Generate HTML Security Report
       if: always()
       run: |
-        echo "# Security Analysis Report" > combined-security-report.md
-        echo "" >> combined-security-report.md
-        echo "**Generated on:** $(date)" >> combined-security-report.md
-        echo "" >> combined-security-report.md
-        echo "## ��� Snyk Vulnerability Scan" >> combined-security-report.md
+        cat > security-report.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Security Analysis Report - Fitness Class Scheduler</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+                .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+                h2 { color: #34495e; margin-top: 30px; }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+                .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0; }
+                .card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db; }
+                .vulnerability { background: #fff5f5; border-left: 4px solid #e74c3c; padding: 15px; margin: 10px 0; border-radius: 4px; }
+                .success { background: #f0fff4; border-left: 4px solid #27ae60; padding: 15px; margin: 10px 0; border-radius: 4px; }
+                .warning { background: #fffbf0; border-left: 4px solid #f39c12; padding: 15px; margin: 10px 0; border-radius: 4px; }
+                .code { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 4px; overflow-x: auto; font-family: 'Courier New', monospace; }
+                .badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+                .badge-high { background: #e74c3c; color: white; }
+                .badge-medium { background: #f39c12; color: white; }
+                .badge-low { background: #f1c40f; color: black; }
+                .badge-success { background: #27ae60; color: white; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background: #34495e; color: white; }
+                .footer { text-align: center; margin-top: 40px; color: #7f8c8d; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🔒 Security Analysis Report</h1>
+                    <p><strong>Project:</strong> Fitness Class Scheduler</p>
+                    <p><strong>Generated:</strong> $(date)</p>
+                    <p><strong>Repository:</strong> Sathvikasharma07/Fitness_Scheduler_System</p>
+                </div>
+        
+                <div class="summary">
+                    <div class="card">
+                        <h3>🔍 Snyk Scan</h3>
+                        <p>Dependency vulnerability analysis</p>
+        EOF
+        
         if [ -f snyk-report.json ]; then
-          echo "✅ Snyk scan completed successfully" >> combined-security-report.md
-          echo "" >> combined-security-report.md
-          echo "### Results:" >> combined-security-report.md
-          echo '```json' >> combined-security-report.md
-          cat snyk-report.json >> combined-security-report.md
-          echo '```' >> combined-security-report.md
+            echo '<span class="badge badge-success">Completed</span>' >> security-report.html
         else
-          echo "❌ Snyk scan failed or no report generated" >> combined-security-report.md
+            echo '<span class="badge badge-warning">Failed</span>' >> security-report.html
         fi
-        echo "" >> combined-security-report.md
-        echo "## ��� SonarCloud Analysis" >> combined-security-report.md
-        echo "✅ SonarCloud scan completed" >> combined-security-report.md
-        echo "View detailed results at: https://sonarcloud.io/project/overview?id=Sathvikasharma07_Fitness_Scheduler_System" >> combined-security-report.md
+        
+        cat >> security-report.html << 'EOF'
+                    </div>
+                    <div class="card">
+                        <h3>📊 SonarCloud</h3>
+                        <p>Code quality & security analysis</p>
+                        <span class="badge badge-success">Completed</span>
+                    </div>
+                </div>
+        
+                <h2>🔍 Snyk Vulnerability Scan Results</h2>
+        EOF
+        
+        if [ -f snyk-report.json ]; then
+            echo '<div class="success">✅ Snyk scan completed successfully</div>' >> security-report.html
+            echo '<h3>Detailed Results:</h3>' >> security-report.html
+            echo '<div class="code">' >> security-report.html
+            cat snyk-report.json | sed 's/</\</g' | sed 's/>/\>/g' >> security-report.html
+            echo '</div>' >> security-report.html
+        else
+            echo '<div class="warning">⚠️ Snyk scan failed or no vulnerabilities found</div>' >> security-report.html
+        fi
+        
+        cat >> security-report.html << 'EOF'
+        
+                <h2>📊 SonarCloud Analysis</h2>
+                <div class="success">
+                    ✅ SonarCloud analysis completed successfully
+                </div>
+                <p><strong>View detailed results:</strong> 
+                   <a href="https://sonarcloud.io/project/overview?id=Sathvikasharma07_Fitness_Scheduler_System" target="_blank">
+                       SonarCloud Dashboard
+                   </a>
+                </p>
+        
+                <h2>📋 Security Recommendations</h2>
+                <div class="card">
+                    <h3>🔧 Action Items</h3>
+                    <ul>
+                        <li>Review and fix any high/medium severity vulnerabilities found by Snyk</li>
+                        <li>Check SonarCloud dashboard for code quality issues</li>
+                        <li>Update dependencies regularly to latest secure versions</li>
+                        <li>Implement security headers in your web application</li>
+                        <li>Regular security audits and penetration testing</li>
+                    </ul>
+                </div>
+        
+                <div class="footer">
+                    <p>Generated by GitHub Actions Security Workflow</p>
+                    <p>Report generated on: $(date)</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        EOF
     
     - name: Upload Security Reports
       uses: actions/upload-artifact@v4
@@ -86,7 +156,19 @@ jobs:
         name: security-reports
         path: |
           snyk-report.json
-          security-report.md
-          combined-security-report.md
+          security-report.html
         retention-days: 30
-
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: always()
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./
+        publish_branch: gh-pages
+        keep_files: false
+        allow_empty_commit: false
+        force_orphan: true
+        enable_jekyll: false
+        disable_nojekyll: false
+        exclude_assets: '.github,frontend,backend,node_modules'
